@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>預約課程</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --black: #111111;
+            --gun: #2B2B2B;
+            --gold: #D5C79A;
+            --gold-light: #F5EED4;
+        }
+
+        body {
+            background-color: var(--black);
+            color: var(--gold-light);
+            font-family: "Noto Sans TC", sans-serif;
+        }
+
+        .card {
+            background-color: var(--gun);
+            border: 1px solid var(--gold);
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 0 12px rgba(213,199,154,0.25);
+        }
+
+        label {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #1A1A1A;
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 6px rgba(213,199,154,0.6);
+            background-color: #1A1A1A;
+            color: #fff;
+        }
+
+        .btn-gold {
+            background-color: var(--gold);
+            color: black;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .btn-gold:hover {
+            background-color: #E8DFC0;
+        }
+
+        .title-box {
+            background-color: #1C1C1C;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--gold);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .title-box h2 {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 28px;
+        }
+
+        /* 金色 select 下拉箭頭 */
+        .form-select {
+            background-image:
+                url("data:image/svg+xml;utf8,<svg fill='%23D5C79A' height='16' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        /* 日期 icon 變金色 */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(80%) sepia(20%) saturate(300%) hue-rotate(10deg);
+            opacity: 1;
+        }
+        input[type="date"] {
+            color: var(--gold-light);
+        }
+        input[type="date"]::-moz-calendar-picker-indicator {
+            filter: invert(80%);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container py-4">
+
+    <div class="title-box">
+        <h2>預約課程</h2>
+    </div>
+
+    <div class="card">
+
+        <form action="/book" method="POST">
+
+            <!-- 教練 -->
+            <div class="mb-3">
+                <label>選擇教練（必填）</label>
+                <select class="form-select" id="coachSelect" name="coach_id" required>
+                    <option value="">請選擇教練</option>
+                    {% for c in coaches %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 日期 -->
+            <div class="mb-3">
+                <label>選擇日期（必填）</label>
+                <input type="date" class="form-control" id="dateInput" name="date" min="{{ today }}" required>
+            </div>
+
+            <!-- 時段 -->
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label>時段（小時）</label>
+                    <select class="form-select" id="hourSelect" name="hour" required>
+                        <option value="">選擇小時</option>
+                    </select>
+                </div>
+
+                <div class="col-6">
+                    <label>分鐘</label>
+                    <select class="form-select" id="minuteSelect" name="minute" required>
+                        <option value="">選擇分鐘</option>
+                        <option value="00">00</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 課程類別 -->
+            <div class="mb-3">
+                <label>課程類別（必填）</label>
+                <select class="form-select" name="course_type" required>
+                    <option value="">請選擇課程</option>
+                    {% for ct in course_types %}
+                        <option value="{{ ct }}">{{ ct }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <hr class="border-light">
+
+            <!-- 基本資料 -->
+            <h5 class="text-center mb-3" style="color: var(--gold); font-weight:700;">預約人基本資料</h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>姓名（必填）</label>
+                    <input type="text" class="form-control" name="client_name" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>生日（必填）</label>
+                    <input type="date" class="form-control" name="birthday" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>電話（必填）</label>
+                    <input type="text" class="form-control" name="phone" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="email">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>性別</label>
+                    <select class="form-select" name="gender">
+                        <option value="">不指定</option>
+                        <option value="女">女</option>
+                        <option value="男">男</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Line ID</label>
+                    <input type="text" class="form-control" name="line_id">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label>備註</label>
+                <textarea class="form-control" name="note" rows="2"></textarea>
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-gold px-5 py-2" type="submit">送出預約</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ★★★ 預約成功彈窗 Modal ★★★ -->
+<div class="modal fade" id="successModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color:#1A1A1A; border:1px solid var(--gold);">
+
+      <div class="modal-header" style="border-bottom:1px solid var(--gold);">
+        <h5 class="modal-title" style="color:var(--gold); font-weight:700;">預約成功！</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center" style="color:var(--gold-light);">
+        {% if last_booking %}
+            <p>姓名：{{ last_booking.client_name }}</p>
+            <p>教練：{{ last_booking.coach }}</p>
+            <p>日期：{{ last_booking.date }}</p>
+            <p>時間：{{ last_booking.time }}</p>
+            <p>課程：{{ last_booking.course_type }}</p>
+
+            {% if last_booking.note %}
+            <p>備註：{{ last_booking.note }}</p>
+            {% endif %}
+        {% else %}
+            <p>預約完成！</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 自動開啟彈窗 -->
+{% if last_booking %}
+<script>
+window.onload = () => {
+    new bootstrap.Modal(document.getElementById("successModal")).show();
+};
+</script>
+{% endif %}
+
+<!-- JS：動態載入可預約時段 -->
+<script>
+function loadAvailableTimes() {
+    const coachId = document.getElementById("coachSelect").value;
+    const dateVal = document.getElementById("dateInput").value;
+
+    if (!coachId || !dateVal) return;
+
+    fetch(`/available_times?coach_id=${coachId}&date=${dateVal}`)
+        .then(res => res.json())
+        .then(times => {
+            const hourSelect = document.getElementById("hourSelect");
+            hourSelect.innerHTML = '<option value="">選擇小時</option>';
+
+            let added = new Set();
+
+            times.forEach(t => {
+                const h = t.split(":")[0];
+                if (!added.has(h)) {
+                    added.add(h);
+                    hourSelect.innerHTML += `<option value="${h}">${h}</option>`;
+                }
+            });
+        });
+}
+
+document.getElementById("coachSelect").addEventListener("change", loadAvailableTimes);
+document.getElementById("dateInput").addEventListener("change", loadAvailableTimes);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
